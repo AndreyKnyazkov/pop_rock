@@ -1,0 +1,22 @@
+/* START TABS PLUGIN */
+.open .tab-js-subtitle {
+  -webkit-transform: scaleY(1);
+  transform: scaleY(1);
+  -webkit-transform-origin: top;
+  transform-origin: top;
+  -webkit-transition: -webkit-transform .4s ease;
+  transition: -webkit-transform .4s ease;
+  transition: transform .4s ease;
+  transition: transform .4s ease, -webkit-transform .4s ease;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.close .tab-js-subtitle {
+  height: 0;
+  -webkit-transition: height 1s ease-out;
+  transition: height 1s ease-out;
+  -webkit-transform: scaleY(0);
+  transform: scaleY(0);
+}
+/* END TABS PLUGIN */
