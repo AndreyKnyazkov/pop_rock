@@ -7,7 +7,7 @@ var current_status = {
 var wavesurferMain = WaveSurfer.create({
   container: '#waveform',
   backend: 'MediaElement',
-  waveColor: 'blue',
+  setWaveColor: 'blue',
   progressColor: 'purple',
   hideScrollbar: true
 });
@@ -150,4 +150,19 @@ wavesurferMain.on('seek', function(position) {
   wavesurfers[wavesurferMain.current_index].setDisabledEventEmissions(['seek'])
   wavesurfers[wavesurferMain.current_index].seekTo(position);
   wavesurfers[wavesurferMain.current_index].setDisabledEventEmissions([])
+});
+
+//Load song when play is pressed
+wavesurferMain.on("play", function () {
+  if (!wavesurferMain.loaded) {
+    wavesurferMain.load(wavesurferMain.song, wavesurferMain.backend.peaks);
+  }
+});
+
+//Start playing after song is loaded
+wavesurferMain.on("ready", function () {
+  if (!wavesurferMain.loaded) {
+    wavesurferMain.loaded = true;
+    wavesurferMain.play();
+  }
 });
