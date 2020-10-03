@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RGB Studio</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <section class="test">
+    <div class="container">
+      <!-- main wavesurfer.js lib -->
+      <script src="https://unpkg.com/wavesurfer.js"></script>
+
+      <!-- <div class="wave"> -->
+      <div class="wave-form" preload="false" data-path="./audio/George-Hollingdrake.mp3">
+        <button type="button">Play / Pause</button>
+        <div class="wave-container"></div>
+      </div>
+      <div class="wave-form" data-path="./audio/Jared-Norman-Hara.mp3">
+        <button type="button">Play / Pause</button>
+        <div class="wave-container"></div>
+      </div>
+      <div class="wave-form" data-path="./audio/Tom-Barnes.mp3">
+        <button type="button">Play / Pause</button>
+        <div class="wave-container"></div>
+      </div>
+
+
+
+
+      <h2>Main Player</h2>
+      <div id="waveform"></div>
+      <script src="./js/main.js"></script>
+    </div>
+  </section>
+
+  <script src="js/jquery-3.4.1.min.js"></script>
+  <script src="js/slick.min.js"></script>
+  <script src="js/jquery.validate.min.js"></script>
+  <script src="js/jquery.maskedinput.min.js"></script>
+  <script src="js/jquery.fancybox.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/plugings.js"></script>
+</body>
+
+</html>

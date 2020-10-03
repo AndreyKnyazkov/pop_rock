@@ -1,168 +1,68 @@
-var current_status = {
-  position: 0,
-  index: null,
-  audio_status: "pause"
-}
+// Create a WaveSurfer instance
+var wavesurfer;
 
-var wavesurferMain = WaveSurfer.create({
-  container: '#waveform',
-  backend: 'MediaElement',
-  setWaveColor: 'blue',
-  progressColor: 'purple',
-  hideScrollbar: true
-});
-
-wavesurferMain.current_index = null
-
-wavesurferMain.setVolume(0);
-
-var wavesurfers = [];
-var versions = [];
-var $i = 0;
-
-document.querySelectorAll("button").forEach(button => {
-  button.addEventListener('click', function(){
-    playTrack(parseInt(button.getAttribute('data-player')))
-  });
-});
-
-document.querySelectorAll(".wave-form").forEach(wavesurfer => {
-  var id = '_' + Math.random().toString(36).substr(2, 9);
-  var path = wavesurfer.getAttribute('data-path')
-
-  wavesurfer.querySelector(".wave-container").setAttribute("id", id)
-  wavesurfer.querySelector(".wave-container").setAttribute("data-player", $i)
-  wavesurfer.querySelector("button").setAttribute("data-player", $i)
-  wavesurfer.querySelector("button").setAttribute("data-plyaer-id", id)
-
-  versions.push({
-    id: id,
-    path: path
-  })
-  $i++;
-})
-
-versions.forEach((version, index) => {
-  renderWaveForm(version.path, version.id, index);
-});
-
-function renderWaveForm(url, id, index) {
+// Init on DOM ready
+document.addEventListener('DOMContentLoaded', function () {
   wavesurfer = WaveSurfer.create({
-    container: '#' + id,
-    waveColor: 'red',
-    backend: 'MediaElement',
-    progressColor: 'purple',
-    hideScrollbar: true
+    container: '#waveform',
+    waveColor: '#428bca',
+    progressColor: '#31708f',
+    height: 120,
+    barWidth: 3
   });
-  wavesurfer.custom_id = "#" + id
-  wavesurfer.index = index
-  wavesurfer.url = url
-  wavesurfer.load(url);
-  wavesurfers.push(wavesurfer);
-  return wavesurfer;
-}
-
-function playTrack(playerIndex) {
-  if(current_status.index === playerIndex) {
-    if (wavesurfers[playerIndex].isPlaying()) {
-      pause(playerIndex)
-    } else {
-      play(playerIndex);
-    }
-  } else if (current_status.index !== playerIndex) {
-    if (current_status.index === null) {
-      current_status.index = playerIndex
-      play(playerIndex)
-    } else if (wavesurfers[current_status.index].isPlaying()) {
-      stop(current_status.index)
-      pause(current_status.index)
-      current_status.index = playerIndex
-      play(playerIndex)
-    } else {
-      wavesurfers[current_status.index].stop()
-      wavesurfers[current_status.index].pause()
-      current_status.index = playerIndex
-      play(playerIndex)
-    }
-  }
-}
-
-function stopAll(){
-  wavesurfers.forEach((wavesurfer) => {
-    wavesurfer.stop()
-    wavesurfer.pause()
-  })
-  wavesurferMain.stop()
-  current_status.audio_status = "pause"
-}
-
-function stopUnSeekAudion(index){
-  wavesurfers.forEach((wavesurfer, key) => {
-    if (key === current_status.index) {
-      wavesurfer.play()
-    }
-    if(index !== key && wavesurfer.isPlaying()) {
-      wavesurfer.stop()
-      wavesurfer.pause()
-    }
-  })
-  wavesurferMain.pause()
-  current_status.index = index
-  current_status.audio_status = "pause"
-}
-
-function play(index){
-  wavesurfers.forEach((wavesurfer, key) => {
-    if(key === index) wavesurfer.play()
-  })
-  if(index !== wavesurferMain.current_index || wavesurferMain.current_index === null){
-    wavesurferMain.current_index = index
-    wavesurferMain.load(versions[index].path);
-  }
-  wavesurferMain.play(wavesurfers[index].getCurrentTime())
-  current_status.audio_status = "play"
-}
-
-function pause(index){
-  wavesurfers.forEach((wavesurfer, key) => {
-    if(key === index) wavesurfer.pause()
-  })
-  wavesurferMain.pause()
-  current_status.audio_status = "pause"
-}
-
-function stop(index){
-  wavesurfers.forEach((wavesurfer, key) => {
-    if(key === index) wavesurfer.stop()
-  })
-  wavesurferMain.stop()
-  current_status.audio_status = "pause"
-}
-
-wavesurfers.forEach((wavesurfer,index) => {
-  wavesurfer.on('seek', function(position) {
-    stopUnSeekAudion(index)
-    play(index)
-  })
 });
 
-wavesurferMain.on('seek', function(position) {
-  wavesurfers[wavesurferMain.current_index].setDisabledEventEmissions(['seek'])
-  wavesurfers[wavesurferMain.current_index].seekTo(position);
-  wavesurfers[wavesurferMain.current_index].setDisabledEventEmissions([])
-});
+// Bind controls
+document.addEventListener('DOMContentLoaded', function () {
+  var playPause = document.querySelector('#playPause');
+  playPause.addEventListener('click', function () {
+    wavesurfer.playPause();
+  });
 
-//Load song when play is pressed
-wavesurferMain.on("play", function () {
-  if (!wavesurferMain.loaded) {
-    wavesurferMain.load(wavesurferMain.song, wavesurferMain.backend.peaks);
-  }
-});
+  // Toggle play/pause text
+  wavesurfer.on('play', function () {
+    document.querySelector('#play').style.display = 'none';
+    document.querySelector('#pause').style.display = '';
+  });
+  wavesurfer.on('pause', function () {
+    document.querySelector('#play').style.display = '';
+    document.querySelector('#pause').style.display = 'none';
+  });
 
-//Start playing after song is loaded
-wavesurferMain.on("ready", function () {
-  if (!wavesurferMain.loaded) {
-    wavesurferMain.loaded = true;
-    wavesurferMain.play();
-  }
+  // The playlist links
+  var links = document.querySelectorAll('#playlist a');
+  var currentTrack = 0;
+
+  // Load a track by index and highlight the corresponding link
+  var setCurrentSong = function (index) {
+    links[currentTrack].classList.remove('active');
+    currentTrack = index;
+    links[currentTrack].classList.add('active');
+    wavesurfer.load(links[currentTrack].href);
+  };
+
+  // Load the track on click
+  Array.prototype.forEach.call(links, function (link, index) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      setCurrentSong(index);
+    });
+  });
+
+  // Play on audio load
+  wavesurfer.on('ready', function () {
+    wavesurfer.play();
+  });
+
+  wavesurfer.on('error', function (e) {
+    console.warn(e);
+  });
+
+  // Go to the next track on finish
+  wavesurfer.on('finish', function () {
+    setCurrentSong((currentTrack + 1) % links.length);
+  });
+
+  // Load the first track
+  setCurrentSong(currentTrack);
 });
