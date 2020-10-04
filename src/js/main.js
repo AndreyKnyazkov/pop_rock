@@ -64,5 +64,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // Load the first track
-  setCurrentSong(currentTrack);
+  //загружает текущий трек
+  //setCurrentSong(currentTrack);
 });
